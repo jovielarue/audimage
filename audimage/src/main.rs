@@ -1,4 +1,3 @@
-mod dialup;
 mod images;
 use std::collections::BTreeMap;
 
@@ -22,7 +21,7 @@ fn main() {
             if curr_luma != pixel.0 {
                 println!("Coordinates for luma val: {}", pixel.0)
             }
-            println!("{:?}", coord);
+            println!("{},{}", coord.0, coord.1);
             curr_luma = pixel.0;
         }
     }
