@@ -1,3 +1,4 @@
+use image::*;
 use std::{
     collections::BTreeMap,
     io::{BufRead, BufReader, Lines},
@@ -17,8 +18,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input = child_out.lines();
 
     // reform the pixel_map BTree with luma_val:Vec<coord> pairs that is output by audimage
-    let pixel_map = parse_input(input);
+    let (dimensions, pixel_map) = parse_input(input);
     println!("{:?}", pixel_map);
+
+    create_image(dimensions, pixel_map);
 
     Ok(())
 }
@@ -71,4 +74,19 @@ fn parse_input(
     }
 
     (img_dimensions, result)
+}
+
+fn create_image(dimensions: (u32, u32), pixel_map: BTreeMap<u8, Vec<(u32, u32)>>) {
+    let mut image = GrayImage::new(dimensions.0, dimensions.1);
+
+    for entry in pixel_map {
+        let luma_val = entry.0;
+        let coords: Vec<(u32, u32)> = entry.1;
+
+        for coord in coords {
+            image.put_pixel(coord.0, coord.1, Luma([luma_val]));
+        }
+    }
+
+    image.save("./test.jpg").expect("Unable to save image.");
 }

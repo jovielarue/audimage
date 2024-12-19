@@ -7,7 +7,7 @@ pub fn read_img_info(input_path: &str) -> ((u32, u32), Vec<(u32, u32, Luma<u8>)>
     let resized_img = resize_img(&img);
     // convert img to Luma (greyscale)
     let luma_img = resized_img.to_luma8();
-    let (width, height) = img.dimensions();
+    let (width, height) = resized_img.dimensions();
 
     // Get a vec with (x,y) coords along with its luma value
     let pixels: Vec<(u32, u32, Luma<u8>)> = luma_img
