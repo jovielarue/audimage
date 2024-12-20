@@ -9,7 +9,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let (img_dimensions, pixel_map) = parse_stdin(stdin, &mut pixel_map);
 
-    create_image(img_dimensions, pixel_map.clone());
+    create_image(&img_dimensions, pixel_map.clone());
 
     Ok(())
 }
@@ -44,7 +44,11 @@ fn parse_stdin(
                 } else if output.contains(",") {
                     // all other lines will contain coordinates split by ",", assuming clean data
                     let coords: Vec<&str> = output.split(",").collect();
+
                     if coords.len() == 2 {
+                        // if x coordinate is greater than the image x dimensions, it defaults to
+                        // the max dimension. This sometimes happens when the minimodem rx is
+                        // interfered with.
                         let x: u32 = coords[0].parse().unwrap_or(0);
                         let y: u32 = coords[1].parse().unwrap_or(0);
 
@@ -68,17 +72,29 @@ fn parse_stdin(
     (img_dimensions, pixel_map)
 }
 
-fn create_image(dimensions: (u32, u32), pixel_map: BTreeMap<u8, Vec<(u32, u32)>>) {
+fn create_image(dimensions: &(u32, u32), pixel_map: BTreeMap<u8, Vec<(u32, u32)>>) {
     let mut image = GrayImage::new(dimensions.0, dimensions.1);
 
     for entry in pixel_map {
         let luma_val = entry.0;
         let coords: Vec<(u32, u32)> = entry.1;
 
-        for coord in coords {
-            image.put_pixel(coord.0, coord.1, Luma([luma_val]));
+        for coord in &coords {
+            println!(
+                "Inserting luma val {} for coords ({},{}).",
+                luma_val, coord.0, coord.1
+            );
+            // checking to see if pixel exists before writing to avoid panicking
+            match image.get_pixel_mut_checked(coord.0, coord.1) {
+                Some(px) => px.0 = [luma_val],
+                None => eprintln!(
+                    "Coordinates {:?},{:?} does not exist in image size {}x{}.",
+                    coord.0, coord.1, dimensions.0, dimensions.1
+                ),
+            }
         }
     }
 
     image.save("./test.jpg").expect("Unable to save image.");
+    println!("Saved image!");
 }
