@@ -5,6 +5,9 @@ use images::{process_luma_val, read_img_info};
 
 fn main() {
     let (dimensions, pixels) = read_img_info("/home/jovie/Pictures/seeingrainbows.jpeg");
+
+    // leading few dots to account for rx delay
+    println!(".\n.\n.\n");
     println!("{:?}x{:?}", dimensions.0, dimensions.1);
 
     // pixel_map stores the luma value with a vec of all coordinates where the luma value appears
@@ -25,4 +28,7 @@ fn main() {
             curr_luma = pixel.0;
         }
     }
+
+    // exit condition
+    println!(";;");
 }
