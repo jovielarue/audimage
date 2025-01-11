@@ -1,2 +1,2 @@
 [workspace]
-members=["audimage", "audimage_detect"]
+members=["audimage_transmit", "audimage_receive"]
